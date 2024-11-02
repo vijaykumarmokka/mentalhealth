@@ -127,74 +127,7 @@ def assesment():
 
 
 
-import os
-import requests
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
-
-# Get API key from environment variables
-API_KEY = os.getenv("HUGGINGFACE_API_KEY")  # Make sure to set this in your .env file
-MODEL = "gpt2"  # You can change this to any model you prefer
-
-# Ensure API key is available
-if not API_KEY:
-    raise ValueError("Please set HUGGINGFACE_API_KEY environment variable.")
-
-# Hugging Face API endpoint for inference
-API_URL = f"https://api-inference.huggingface.co/models/{MODEL}"
-
-# Function to make API requests with Bearer token
-def make_api_request(prompt):
-    headers = {
-        'Authorization': f'Bearer {API_KEY}',
-        'Content-Type': 'application/json'
-    }
-
-    payload = {
-        "inputs": prompt,
-        "parameters": {
-            "max_length": 100,
-            "temperature": 0.7
-        }
-    }
-
-    response = requests.post(API_URL, headers=headers, json=payload)
-
-    if response.status_code == 200:
-        return response.json()  # Return the generated text
-    else:
-        raise Exception(f"API request failed with status code: {response.status_code}, response: {response.text}")
-
-@main.route('/feedback', methods=['GET'])
-def feedback():
-    assessments = Assessment.query.all()
-
-    # Prepare the data to send to the Hugging Face model as a single text prompt
-    prompt_text = "\n".join([
-        f"Assessment for user with course: {assessment.course}, gender: {assessment.gender}, "
-        f"sleep quality: {assessment.sleep_quality}, physical activity: {assessment.physical_activity}, "
-        f"diet quality: {assessment.diet_quality}, social support: {assessment.social_support}, "
-        f"relationship status: {assessment.relationship_status}, substance use: {assessment.substance_use}, "
-        f"counseling service use: {assessment.counseling_service_use}, family history: {assessment.family_history}, "
-        f"chronic illness: {assessment.chronic_illness}, extracurricular involvement: {assessment.extracurricular_involvement}, "
-        f"residence type: {assessment.residence_type}, age: {assessment.age}, CGPA: {assessment.cgpa}, "
-        f"stress level: {assessment.stress_level}, financial stress: {assessment.financial_stress}, "
-        f"semester credit load: {assessment.semester_credit_load}"
-        for assessment in assessments
-    ])
-
-    try:
-        # Make the API request to Hugging Face
-        feedback_data = make_api_request("these are the scores of a patient  now take them into consideration and give a summarized feedback for this"+prompt_text)
-
-        # Render the feedback in the template
-        return render_template('feedback.html', feedback=feedback_data)
-
-    except Exception as e:
-        flash(f'Error communicating with the AI model: {str(e)}', 'danger')
-        return render_template('feedback.html', feedback=None)
 
 
 
