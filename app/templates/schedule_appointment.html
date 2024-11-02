@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Appointment</title>
+    <style>
+        /* Base Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Form Container */
+        .form-container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Form Labels and Inputs */
+        label {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input[type="datetime-local"], input[type="time"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        input[type="datetime-local"]:focus, input[type="time"]:focus, input[type="text"]:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 4px rgba(52, 152, 219, 0.5);
+        }
+
+        /* Submit Button */
+        input[type="submit"] {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: #3498db;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #2980b9;
+        }
+
+        /* Form Centering */
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h1>Schedule Appointment</h1>
+        <form method="POST">
+            <label for="date">Date:</label>
+            <input type="datetime-local" id="date" name="date" required>
+        
+            <label for="time">Time:</label>
+            <input type="time" id="time" name="time" required>
+        
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description" required>
+        
+            <input type="submit" value="Schedule Appointment">
+        </form>
+    </div>
+
+</body>
+</html>

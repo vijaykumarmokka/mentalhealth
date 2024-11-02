@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Tracker - Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        nav {
+            background-color: #f8f8f8;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            width: 100%;
+            border-bottom: 1px solid #ddd;
+            z-index: 1000; /* Ensures navbar is on top */
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #0f4c81, #0f91c7);
+            display: flex;
+            flex-direction: column; /* Change to column layout */
+            align-items: center; /* Center align items */
+            min-height: 100vh; /* Full viewport height */
+            overflow: hidden; /* Remove scroll bars */
+        }
+
+        .register-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 400px;
+            margin-top: 20px; /* Adds space between navbar and registration form */
+        }
+        
+        .register-container img {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+
+        .register-container h2 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #d9534f;
+        }
+
+        .register-container form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .register-container input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .register-container .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 45%;
+            margin: 10px;
+        }
+
+        .btn-cancel {
+            background-color: #d9534f;
+            color: white;
+        }
+
+        .btn-register {
+            background-color: #5cb85c;
+            color: white;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .alert-danger, .alert-success {
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .alert-danger {
+            background-color: #d9534f;
+        }
+
+        .alert-success {
+            background-color: #5cb85c;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <a href="{{ url_for('main.home') }}">NextGen</a>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('main.home') }}">Home</a>
+            <a href="#">About us</a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('main.login') }}">Log in</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="register-container">
+        <img src="{{ url_for('static', filename='profile-placeholder.jpg') }}" alt="Profile Picture">
+        <form method="POST">
+            {{ form.hidden_tag() }}  <!-- This generates the CSRF token -->
+            <input type="text" placeholder="EUID" name="euid" required>
+            <input type="text" placeholder="First Name" name="first_name" required>
+            <input type="text" placeholder="Last Name" name="last_name" required>
+            <input type="date" placeholder="Date of Birth" name="dob" required>
+            <input type="email" placeholder="Email" name="email" required>
+            <input type="password" placeholder="Password" name="password" required>
+            
+            <div class="button-container">
+                <button type="button" class="btn btn-cancel" onclick="window.location.href='{{ url_for('main.home') }}'">Cancel</button>
+
+                <button type="submit" name="register" class="btn btn-register">Register</button>
+            </div>
+        </form>
+
+        <!-- Error alerts -->
+        {% for field_name, errors in form.errors.items() %}
+            <div class="alert alert-danger">
+                {{ field_name|capitalize }}: {{ ', '.join(errors) }}
+            </div>
+        {% endfor %}
+
+        <!-- Success message after registration -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+</body>
+</html>

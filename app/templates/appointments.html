@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments</title>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        /* Appointment List */
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        li:hover {
+            background-color: #e6f7ff;
+        }
+
+        .appointment-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .appointment-info span {
+            font-size: 1.1em;
+        }
+
+        .appointment-info small {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* Buttons */
+        .button {
+            padding: 8px 12px;
+            font-size: 0.9em;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #2980b9;
+        }
+
+        .button-delete {
+            background-color: #e74c3c;
+            margin-left: 10px;
+        }
+
+        .button-delete:hover {
+            background-color: #c0392b;
+        }
+
+        /* Form Styling (for delete form inline with buttons) */
+        form {
+            display: inline;
+        }
+
+        /* Add Appointment Button */
+        .add-appointment {
+            display: block;
+            width: max-content;
+            margin: 20px auto;
+            background-color: #2ecc71;
+            padding: 10px 15px;
+            color: white;
+            text-align: center;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 1.2em;
+        }
+
+        .add-appointment:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Appointments</h1>
+
+    <div class="container">
+        <a href="{{ url_for('main.schedule_appointment') }}" class="add-appointment">Schedule New Appointment</a>
+
+        <ul>
+            {% for appointment in appointments %}
+                <li>
+                    <div class="appointment-info">
+                        <span>{{ appointment.date }}</span>
+                        <small>{{ appointment.description }}</small>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('main.edit_appointment', appointment_id=appointment.id) }}" class="button">Edit</a>
+                        <form action="{{ url_for('main.delete_appointment', appointment_id=appointment.id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this appointment?');">
+                            <button type="submit" class="button button-delete">Delete</button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+</html>

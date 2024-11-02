@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Medications</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        nav {
+            background-color: #35424a;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+        .container {
+            display: flex; /* Use flexbox for two columns */
+            max-width: 1200px; /* Limit the maximum width of the container */
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .form-section, .medications-section {
+            flex: 1; /* Allow both sections to grow equally */
+            margin: 0 10px; /* Margin between columns */
+        }
+        h1 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #35424a;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        h2 {
+            text-align: center;
+        }
+        ul {
+            list-style-type: none; /* Remove bullets */
+            padding: 0; /* Remove default padding */
+        }
+        li {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px; /* Space between list items */
+        }
+        a {
+            display: block; /* Make the link full width */
+            margin-top: 10px; /* Space between the medication details and link */
+            text-align: center; /* Center the text */
+            color: #007BFF; /* Link color */
+            text-decoration: none; /* Remove underline */
+        }
+        a:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">
+        <a href="{{ url_for('main.index') }}">Mental Health Tracker</a>
+    </div>
+    <div class="nav-links">
+        <a href="{{ url_for('main.index') }}">Home</a>
+        <a href="{{ url_for('main.logout') }}">Logout</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="form-section">
+        <h1>Track Your Medications</h1>
+        <form action="{{ url_for('main.track_medications') }}" method="POST">
+            <label for="medication_name">Medication Name:</label>
+            <input type="text" id="medication_name" name="medication_name" required>
+
+            <label for="dosage">Dosage (e.g., 500mg):</label>
+            <input type="text" id="dosage" name="dosage" required>
+
+            <label for="frequency">Frequency:</label>
+            <select id="frequency" name="frequency" required>
+                <option value="">Select frequency</option>
+                <option value="Once a day">Once a day</option>
+                <option value="Twice a day">Twice a day</option>
+                <option value="Three times a day">Three times a day</option>
+                <option value="As needed">As needed</option>
+            </select>
+
+            <label for="start_date">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" required>
+
+            <label for="end_date">End Date (optional):</label>
+            <input type="date" id="end_date" name="end_date">
+
+            <label for="notes">Notes:</label>
+            <textarea id="notes" name="notes" rows="4"></textarea>
+
+            <button type="submit">Add Medication</button>
+        </form>
+    </div>
+
+    <div class="medications-section">
+        <h2>Your Medications</h2>
+        {% if medications %}
+            <ul>
+            {% for medication in medications %}
+                <li>
+                    <h3>{{ medication.medication_name }}</h3>
+                    <p>Dosage: {{ medication.dosage }}</p>
+                    <p>Frequency: {{ medication.frequency }}</p>
+                    <p>Start Date: {{ medication.start_date }}</p>
+                    <p>End Date: {{ medication.end_date }}</p>
+                    <p>Notes: {{ medication.notes }}</p>
+                    <a href="{{ url_for('main.edit_medication', medication_id=medication.id) }}">Edit</a>
+                    <form action="{{ url_for('main.delete_medication', medication_id=medication.id) }}" method="POST" style="display:inline;">
+                        <button type="submit">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>You have not added any medications yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

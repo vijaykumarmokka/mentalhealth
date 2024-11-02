@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+</head>
+<body>
+    <h1>Chat</h1>
+    <div id="chat-box">
+        <!-- Messages will be dynamically inserted here -->
+    </div>
+    <textarea id="message" placeholder="Type your message..."></textarea>
+    <button id="send-button">Send</button>
+
+    <script>
+        const socket = io();
+
+        document.getElementById('send-button').onclick = function() {
+            const message = document.getElementById('message').value;
+            const receiverId = 1; // Replace with actual receiver ID
+            socket.emit('send_message', { content: message, receiver_id: receiverId });
+            document.getElementById('message').value = '';
+        };
+
+        socket.on('receive_message', function(data) {
+            const chatBox = document.getElementById('chat-box');
+            const messageElement = document.createElement('div');
+            messageElement.innerHTML = `${data.sender_id}: ${data.content} <small>${data.timestamp}</small>`;
+            chatBox.appendChild(messageElement);
+        });
+    </script>
+</body>
+</html>

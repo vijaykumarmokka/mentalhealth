@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Contact</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Link to your CSS file -->
+</head>
+<body>
+    <h1>Delete Contact</h1>
+
+    <h2>Are you sure you want to delete this contact?</h2>
+    <p>Name: <strong>{{ contact.name }}</strong></p>
+    <p>Phone: <strong>{{ contact.phone }}</strong></p>
+    <p>Relationship: <strong>{{ contact.relationship }}</strong></p>
+
+    <form action="{{ url_for('main.delete_contact', id=contact.id) }}" method="POST">
+        <button type="submit">Yes, Delete Contact</button>
+    </form>
+    
+    <a href="{{ url_for('main.emergency_support') }}">Cancel</a>
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        <ul>
+        {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
+</body>
+</html>

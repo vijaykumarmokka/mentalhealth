@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Evaluation Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        nav {
+            background-color: #f8f8f8;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            width: 100%;
+            border-bottom: 1px solid #ddd;
+        }
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #35424a;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #35424a;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <a href="{{ url_for('main.home') }}">NextGen</a>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('main.home') }}">Home</a>
+            <a href="#">About us</a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('main.login') }}">Log in</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <header>
+        <h1>Mental Health Evaluation Form</h1>
+    </header>
+
+    <div class="container">
+        <form action="{{ url_for('main.assesment') }}" method="POST">
+            <label for="Course">Course (0-5):</label>
+            <input type="number" name="Course" required>
+
+            <label for="Gender">Gender (0-1):</label>
+            <input type="number" name="Gender" required>
+
+            <label for="Sleep_Quality">Sleep Quality (0-2):</label>
+            <input type="number" name="Sleep_Quality" required>
+
+            <label for="Physical_Activity">Physical Activity (0-2):</label>
+            <input type="number" name="Physical_Activity" required>
+
+            <label for="Diet_Quality">Diet Quality (0-2):</label>
+            <input type="number" name="Diet_Quality" required>
+
+            <label for="Social_Support">Social Support (0-2):</label>
+            <input type="number" name="Social_Support" required>
+
+            <label for="Relationship_Status">Relationship Status (0-2):</label>
+            <input type="number" name="Relationship_Status" required>
+
+            <label for="Substance_Use">Substance Use (0-2):</label>
+            <input type="number" name="Substance_Use" required>
+
+            <label for="Counseling_Service_Use">Counseling Service Use (0-2):</label>
+            <input type="number" name="Counseling_Service_Use" required>
+
+            <label for="Family_History">Family History (0-1):</label>
+            <input type="number" name="Family_History" required>
+
+            <label for="Chronic_Illness">Chronic Illness (0-0):</label>
+            <input type="number" name="Chronic_Illness" required>
+
+            <label for="Extracurricular_Involvement">Extracurricular Involvement (0-2):</label>
+            <input type="number" name="Extracurricular_Involvement" required>
+
+            <label for="Residence_Type">Residence Type (0-2):</label>
+            <input type="number" name="Residence_Type" required>
+
+            <label for="Age">Age (0-17):</label>
+            <input type="number" name="Age" required>
+
+            <label for="CGPA">CGPA (0-142):</label>
+            <input type="number" name="CGPA" step="0.01" required>
+
+            <label for="Stress_Level">Stress Level (0-2):</label>
+            <input type="number" name="Stress_Level" required>
+
+            <label for="Financial_Stress">Financial Stress (0-5):</label>
+            <input type="number" name="Financial_Stress" required>
+
+            <label for="Semester_Credit_Load">Semester Credit Load (0-14):</label>
+            <input type="number" name="Semester_Credit_Load" required>
+            <button type="submit" class="btn btn-cancel" onclick="window.location.href='{{ url_for('main.index') }}'">cancel</button>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+</html>

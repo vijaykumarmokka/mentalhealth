@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Model Feedback</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;  /* Hides scroll bars */
+        }
+        h1 {
+            text-align: center;
+        }
+        .feedback-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;  /* Allows vertical scroll within container */
+        }
+        pre {
+            white-space: pre-wrap; /* Preserve formatting */
+            word-wrap: break-word; /* Prevent long words from breaking the layout */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>AI Model Feedback</h1>
+
+    <div class="feedback-container">
+        {% if feedback %}
+            <h2>Feedback Summary</h2>
+            <pre>{{ feedback | tojson(indent=2) }}</pre>
+        {% else %}
+            <p>No feedback available at the moment.</p>
+        {% endif %}
+    </div>
+
+</body>
+</html>

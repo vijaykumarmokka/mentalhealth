@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - NextGen</title>
+    <style>
+     
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        /* Navbar styling */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0px 4px 2px -2px rgba(0,0,0,0.2);
+        }
+        .navbar .logo {
+            font-weight: bold;
+            font-size: 24px;
+        }
+        .navbar a {
+            color: black;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 18px;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        /* About Us Section */
+        .about-section {
+            padding: 50px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border: 1px solid #ddd;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+        }
+        .about-header {
+            text-align: left;
+        }
+        .about-header h1 {
+            font-size: 40px;
+            color: black;
+        }
+        .about-header a {
+            font-size: 18px;
+            color: #00baff;
+            text-decoration: none;
+            margin-right: 20px;
+        }
+        .about-header a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main content */
+        .content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 30px;
+        }
+        .left-content {
+            width: 40%;
+        }
+        .left-content img {
+            width: 40%;
+            border-radius: 8px;
+        }
+        .left-content p {
+            font-size: 16px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .right-content {
+            width: 55%;
+            text-align: left;
+        }
+        .right-content h2 {
+            font-size: 24px;
+            color: #333;
+        }
+        .right-content p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-top: 20px;
+        }
+
+        /* Columns in the bottom section */
+        .columns {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .column {
+            width: 30%;
+            background-color: #e6f7ff;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .column h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .column p {
+            font-size: 16px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="logo">
+            <span>NextGen</span>
+        </div>
+        <div>
+            <a href="{{ url_for('main.home') }}">Home</a>
+
+            <a href="{{ url_for('main.login') }}">Log in</a>
+        </div>
+    </div>
+
+    <!-- About Us Section -->
+    <section class="about-section">
+        <!-- Header with title and links -->
+        <div class="about-header">
+            <h1>About Us</h1>
+            <a href="#">Who we are?</a>
+            <a href="#">What are we doing?</a>
+            <a href="#">Our vision</a>
+        </div>
+
+        <!-- Main content section with image and text -->
+        <div class="content">
+            <!-- Left side image and caption -->
+            <div class="left-content">
+                <img src="https://via.placeholder.com/300x400" alt="Emil Kraepelin">
+                <p>Emil Kraepelin</p>
+            </div>
+
+            <!-- Right side text -->
+            <div class="right-content">
+                <h2>No psychiatrist in the history of the discipline has had a greater influence on the actual practice of psychiatry (and the related fields) than Emil Kraepelin (1856–1926).</h2>
+                <p>Who are we? At NextGen, we provide easy-to-use tools for managing mental health, offering science-backed assessments and daily check-ins for clear, actionable insights.</p>
+            </div>
+        </div>
+
+        <!-- Three columns section -->
+        <div class="columns">
+            <div class="column">
+                <h3>How NextGen Works</h3>
+                <p>- Quick mental health evaluations</p>
+                <p>- Personalized feedback and wellness recommendations</p>
+                <p>- Progress tracking with charts and reports</p>
+                <p>- Access to a library of mental health resources</p>
+            </div>
+            <div class="column">
+                <h3>Our Vision</h3>
+                <p>Our vision is to create a stigma-free world where mental health is openly discussed, supported by effective tools. Privacy is paramount at NextGen, with all data securely stored and confidential.</p>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
