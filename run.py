@@ -1,10 +1,9 @@
-from app import create_app, db
+from app import create_app, socketio  # Import create_app and socketio
 from flask_socketio import SocketIO
 
+# Create the Flask app
 app = create_app()
-socketio = SocketIO(app)  # Initialize SocketIO with your Flask app
 
+# Run the app with socketio
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()  # Create database tables
-    socketio.run(app, debug=True) 
+    socketio.run(app, debug=True)

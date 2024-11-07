@@ -1,35 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Room</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f7f7f7;
+    }
+    #chat-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow-y: scroll;
+      height: 400px;
+    }
+    #chat-box {
+      margin-bottom: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .message {
+      margin: 10px 0;
+    }
+    .username {
+      font-weight: bold;
+      color: #007bff;
+    }
+    .message-text {
+      margin-left: 10px;
+    }
+    #message-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    #send-button {
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #send-button:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
-    <h1>Chat</h1>
+  <div id="chat-container">
     <div id="chat-box">
-        <!-- Messages will be dynamically inserted here -->
+      <!-- Messages will be appended here dynamically -->
     </div>
-    <textarea id="message" placeholder="Type your message..."></textarea>
-    <button id="send-button">Send</button>
 
-    <script>
-        const socket = io();
+    <textarea id="message-input" placeholder="Type your message..."></textarea>
+    <button id="send-button" onclick="sendMessage()">Send</button>
+  </div>
 
-        document.getElementById('send-button').onclick = function() {
-            const message = document.getElementById('message').value;
-            const receiverId = 1; // Replace with actual receiver ID
-            socket.emit('send_message', { content: message, receiver_id: receiverId });
-            document.getElementById('message').value = '';
-        };
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client/dist/socket.io.min.js"></script>
+  <script>
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-        socket.on('receive_message', function(data) {
-            const chatBox = document.getElementById('chat-box');
-            const messageElement = document.createElement('div');
-            messageElement.innerHTML = `${data.sender_id}: ${data.content} <small>${data.timestamp}</small>`;
-            chatBox.appendChild(messageElement);
-        });
-    </script>
+    // The room is static for this example, you can change it dynamically if needed
+    var room = 'general';
+    console.log('Connecting to room:', room);
+
+    // Emit the 'join' event when the user enters the chat room
+    socket.emit('join', room);
+
+    // Listen for messages from the server
+    socket.on('receive_message', function(data) {
+      console.log("Received message from server:", data);
+      
+      // Ensure data contains both username and message
+      if (data && data.username && data.message) {
+        var chatBox = document.getElementById('chat-box');
+        var message = document.createElement('div');
+        message.classList.add('message');
+        message.innerHTML = '<span class="username">' + data.username + ':</span><span class="message-text"> ' + data.message + '</span>';
+        chatBox.appendChild(message);
+        chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+      } else {
+        console.log("Invalid data received:", data);
+      }
+    });
+
+    // Send message to the server
+    function sendMessage() {
+      var message = document.getElementById('message-input').value;
+      console.log('Sending message:', message);
+      if (message.trim() !== '') {
+        socket.emit('send_message', { message: message, room: room });
+        document.getElementById('message-input').value = ''; // Clear the input field
+      } else {
+        console.log('Message is empty, not sending.');
+      }
+    }
+  </script>
 </body>
 </html>

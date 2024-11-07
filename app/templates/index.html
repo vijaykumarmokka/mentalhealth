@@ -1,150 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Use Cases - Mental Health System</title>
-    <style>
-        nav {
-            background-color: #f8f8f8;
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            width: 100%;
-            border-bottom: 1px solid #ddd;
-            z-index: 1000; /* Ensures navbar is on top */
-        }
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            text-align: center;
-            padding: 50px;
-        }
-        h1 {
-            color: #4CAF50;
-        }
-        .button-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 40px;
-        }
-        .button-grid .button-container {
-            width: 45%; /* Two columns */
-            margin: 10px;
-            text-align: center;
-        }
-        .button-grid .full-width {
-            width: 100%;
-            margin: 10px auto;
-        }
-        button {
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
-<body><nav>
-    <div class="logo">
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('main.index') }}">NextGen</a>
-        {% else %}
-            <a href="{{ url_for('main.home') }}">NextGen</a>
-        {% endif %}
-    </div>
-    <div class="nav-links">
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('main.index') }}">home</a>
-        {% else %}
-            <a href="{{ url_for('main.home') }}">home</a>
-        {% endif %}
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    .container {
+        text-align: center;
+        padding: 70px;
+    }
+    h1 {
+        color: #4CAF50;
+        margin-bottom: 20px; /* Space below the heading */
+    }
+    p {
+        font-size: 1.2rem; /* Larger font for description */
+        color: #333; /* Darker text for better readability */
+    }
+    .button-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 40px;
+    }
+    .button-container {
+        width: 45%; /* Two columns */
+        margin: 10px;
+        text-align: center;
+    }
+    .full-width {
+        width: 100%;
+        margin: 10px auto;
+    }
+    button {
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s; /* Smooth background transition */
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+</style>
+
+<div class="container">
+    <h1>Mental Health Evaluation System - Use Cases</h1>
+    <p>Select a use case to proceed</p>
     
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('main.logout') }}">Logout</a>
-        {% else %}
-            <a href="{{ url_for('main.login') }}">Log in</a>
-        {% endif %}
-    </div>
-</nav>
+    <div class="button-grid">
+        <!-- Use Case 02: Complete Self-Assessment -->
+        <div class="button-container">
+            <button onclick="window.location.href='{{ url_for('main.submit_questionnaire') }}'">Complete Self-Assessment</button>
+        </div>
 
-    <div class="container">
-        <h1>Mental Health Evaluation System - Use Cases</h1>
-        <p>Select a use case to proceed</p>
-        
-        <div class="button-grid">
-            
+        <div class="button-container">
+            <button onclick="window.location.href='{{ url_for('main.view_intervention') }}'">view Personalized Interventions</button>
+        </div>
 
-            <!-- Use Case 02: Complete Self-Assessment -->
-            <div class="button-container">
-                <button onclick="window.location.href='{{ url_for('main.assesment') }}'">Complete Self-Assessment</button>
-            </div>
+        <!-- Use Case 05: Access Educational Resources -->
+        <div class="button-container">
+            <button onclick="window.location.href='{{ url_for('main.educational_resources') }}'">Access Educational Resources</button>
+        </div>
 
-            <!-- Use Case 03: View Mental Health Trends -->
-            <div class="button-container">
-                <button onclick="window.location.href='{{ url_for('main.charts') }}'">View Mental Health Trends</button>
-            </div>
+        <!-- Use Case 07: Track Medication -->
+        <div class="button-container">
+            <button onclick="window.location.href='{{ url_for('main.track_medications') }}'">Track Medication</button>
+        </div>
 
-            <!-- Use Case 04: Receive Personalized Interventions -->
-            <div class="button-container">
-                <button onclick="window.location.href='{{ url_for('main.predict') }}'">Receive Personalized Interventions</button>
-            </div>
+      
+        <div class="button-container">
+            <button onclick="window.location.href='{{ url_for('main.appointments') }}'">View/Manage Appointments</button>
+        </div>
 
-            <!-- Use Case 05: Access Educational Resources -->
-            <div class="button-container">
-                <button onclick="window.location.href='{{ url_for('main.educational_resources') }}'">Access Educational Resources</button>
-            </div>
-
-            <!-- Use Case 06: Manage Emergency Support -->
-            <div class="button-container">
-                <button onclick="window.location.href='{{ url_for('main.emergency_support') }}'">Manage Emergency Support</button>
-            </div>
-
-            <!-- Use Case 07: Track Medication -->
-            <div class="button-container">
-                <button onclick="window.location.href='{{ url_for('main.track_medications') }}'">Track Medication</button>
-            </div>
-
-            <!-- Use Case 08: Communicate with Professional -->
-            <div class="button-container">
-                <button onclick="window.location.href='{{ url_for('main.chat') }}'">Communicate with Professional</button>
-            </div>
-
-            <!-- Use Case 09: View/Manage Appointments -->
-            <div class="button-container">
-                <button onclick="window.location.href='{{ url_for('main.appointments') }}'">View/Manage Appointments</button>
-
-
-            </div>
-
-            <!-- Use Case 10: Manage User Profiles -->
-            <div class="button-container">
-                <button onclick="window.location.href='{{ url_for('main.display_user_profile') }}'">Manage User Profiles</button>
-            </div>
-
-            <!-- Use Case 11: Analyze Predictive Data -->
-            <div class="button-container">
-                <button onclick="window.location.href='/usecase/analyze-predictive-data'">Analyze Predictive Data</button>
-            </div>
-
-            
+        <div class="button-container">
+            <button onclick="window.location.href='{{ url_for('main.predict_emotion') }}'">predicted result</button>
         </div>
     </div>
+</div>
 
-</body>
-</html>
+{% endblock %}

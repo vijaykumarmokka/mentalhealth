@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Racing+Sans+One);
+
+        /* Body and Heading Styles */
+        body {
+            background: #2c3e50;
+            margin: 0 auto;
+            padding: 0;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ecf0f1;
+            font-family: 'Racing Sans One', cursive;
+            text-shadow: 0 2px 2px #0c0e50;
+            margin-top: 20px;  /* Adjust top margin for spacing */
+        }
+
+        /* YouTube Videos List Styles */
+        .youtube_videos {
+            list-style: none;
+            margin: 0 auto;
+            display: block;
+            padding: 0;
+        }
+
+        .youtube {
+            display: inline-block;
+            margin: 1em;
+            cursor: pointer;
+            position: relative;
+            width: 380px;
+            height: 250px;
+            background: #34495e;
+            box-shadow: 0 0.5px 2px #1D242B;
+            transition: transform 0.2s; /* Smooth scale effect */
+        }
+
+        .youtube:hover {
+            transform: scale(1.05); /* Scale up on hover */
+        }
+
+        .thumb {
+            width: 100%;
+            height: 100%;
+            padding: 5px;
+            border: 0;
+            outline: 0;
+        }
+
+        .youtube:after {
+            content: "PLAY THIS VIDEO";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 370px;
+            height: 240px;
+            padding: 5px;
+            background: rgba(38, 180, 174, 0.66);
+            text-align: center;
+            line-height: 250px;
+            font-family: 'Racing Sans One', cursive;
+            color: transparent;
+            transition: all 0.8s ease;
+        }
+
+        .youtube:hover:after {
+            top: 110px;
+            left: 110px;
+            width: 165px;
+            height: 40px;
+            line-height: 40px;
+            background: #34495e;
+            color: #ecf0f1;
+        }
+    </style>
+
+    <h1>My YouTube Videos</h1>
+    <ul class="youtube_videos">
+      {% for video in videos %}
+      <li class="youtube" id="{{ video.video_id }}"></li>
+      {% endfor %}
+    </ul>
+
+    <script>
+        var videos = document.querySelectorAll(".youtube");
+        for (var i = 0; i < videos.length; i++) {
+            var youtube = videos[i];
+            getVideos(youtube);
+        }
+
+        function getVideos(el) {
+            var img = document.createElement("img");
+            img.setAttribute('src', 'http://i.ytimg.com/vi/' + el.id + '/hqdefault.jpg');
+            img.setAttribute('class', 'thumb');
+            var video = document.createElement("div");
+            video.setAttribute("class", "video_here");
+            el.appendChild(img);
+            el.appendChild(video);
+            el.addEventListener('click', function () {
+                var iframe = document.createElement("iframe");
+                iframe.setAttribute('class', 'youtube_video');
+                iframe.setAttribute('src', 'https://www.youtube.com/embed/' + this.id + '?autoplay=1&autohide=1&border=0&wmode=opaque&enablejsapi=1');
+                this.parentNode.replaceChild(iframe, this);
+            }, false);
+        }
+    </script>
+{% endblock %}

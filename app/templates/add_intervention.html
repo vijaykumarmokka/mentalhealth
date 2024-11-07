@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Intervention</title>
+</head>
+<body>
+    <h1>Add Intervention for {{ user.first_name }} {{ user.last_name }}</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.intervention_type.label }}<br>
+            {{ form.intervention_type(size=32) }}
+        </div>
+        <div>
+            {{ form.details.label }}<br>
+            {{ form.details(cols=50, rows=10) }}
+        </div>
+        <div>
+            {{ form.submit() }}
+        </div>
+    </form>
+</body>
+</html>

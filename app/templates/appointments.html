@@ -1,27 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Appointments</title>
-    <style>
-        /* Base Styles */
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }
+{% extends 'base.html' %}
 
-        h1 {
+{% block title %}Appointments{% endblock %}
+
+{% block content %}
+    <style>
+        /* Appointments Page Specific Styles */
+        .appointments-page h1 {
             text-align: center;
             color: #333;
             margin-top: 20px;
         }
 
         /* Container */
-        .container {
+        .appointments-page .container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
@@ -31,12 +22,12 @@
         }
 
         /* Appointment List */
-        ul {
+        .appointments-page ul {
             list-style-type: none;
             padding: 0;
         }
 
-        li {
+        .appointments-page li {
             background-color: #f9f9f9;
             padding: 15px;
             margin-bottom: 10px;
@@ -47,26 +38,26 @@
             transition: background-color 0.3s;
         }
 
-        li:hover {
+        .appointments-page li:hover {
             background-color: #e6f7ff;
         }
 
-        .appointment-info {
+        .appointments-page .appointment-info {
             display: flex;
             flex-direction: column;
         }
 
-        .appointment-info span {
+        .appointments-page .appointment-info span {
             font-size: 1.1em;
         }
 
-        .appointment-info small {
+        .appointments-page .appointment-info small {
             font-size: 0.9em;
             color: #666;
         }
 
         /* Buttons */
-        .button {
+        .appointments-page .button {
             padding: 8px 12px;
             font-size: 0.9em;
             background-color: #3498db;
@@ -78,26 +69,26 @@
             transition: background-color 0.3s;
         }
 
-        .button:hover {
+        .appointments-page .button:hover {
             background-color: #2980b9;
         }
 
-        .button-delete {
+        .appointments-page .button-delete {
             background-color: #e74c3c;
             margin-left: 10px;
         }
 
-        .button-delete:hover {
+        .appointments-page .button-delete:hover {
             background-color: #c0392b;
         }
 
         /* Form Styling (for delete form inline with buttons) */
-        form {
+        .appointments-page form {
             display: inline;
         }
 
         /* Add Appointment Button */
-        .add-appointment {
+        .appointments-page .add-appointment {
             display: block;
             width: max-content;
             margin: 20px auto;
@@ -110,35 +101,33 @@
             font-size: 1.2em;
         }
 
-        .add-appointment:hover {
+        .appointments-page .add-appointment:hover {
             background-color: #27ae60;
         }
     </style>
-</head>
-<body>
 
-    <h1>Appointments</h1>
+    <div class="appointments-page">
+        <h1>Appointments</h1>
 
-    <div class="container">
-        <a href="{{ url_for('main.schedule_appointment') }}" class="add-appointment">Schedule New Appointment</a>
+        <div class="container">
+            <a href="{{ url_for('main.schedule_appointment') }}" class="add-appointment">Schedule New Appointment</a>
 
-        <ul>
-            {% for appointment in appointments %}
-                <li>
-                    <div class="appointment-info">
-                        <span>{{ appointment.date }}</span>
-                        <small>{{ appointment.description }}</small>
-                    </div>
-                    <div>
-                        <a href="{{ url_for('main.edit_appointment', appointment_id=appointment.id) }}" class="button">Edit</a>
-                        <form action="{{ url_for('main.delete_appointment', appointment_id=appointment.id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this appointment?');">
-                            <button type="submit" class="button button-delete">Delete</button>
-                        </form>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
+            <ul>
+                {% for appointment in appointments %}
+                    <li>
+                        <div class="appointment-info">
+                            <span>{{ appointment.date }}</span>
+                            <small>{{ appointment.description }}</small>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('main.edit_appointment', appointment_id=appointment.id) }}" class="button">Edit</a>
+                            <form action="{{ url_for('main.delete_appointment', appointment_id=appointment.id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this appointment?');">
+                                <button type="submit" class="button button-delete">Delete</button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
-
-</body>
-</html>
+{% endblock %}

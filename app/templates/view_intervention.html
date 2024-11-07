@@ -1,0 +1,26 @@
+<!-- view_intervention.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Interventions</title>
+</head>
+<body>
+    <h1>Personalized Interventions for {{ user.username }}</h1>
+
+    {% if interventions %}
+        <ul>
+            {% for intervention in interventions %}
+                <li>
+                    <strong>{{ intervention.intervention_type }}</strong><br>
+                    {{ intervention.details }}<br>
+                    <em>Added on: {{ intervention.date_added.strftime('%Y-%m-%d') }}</em>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No interventions found.</p>
+    {% endif %}
+</body>
+</html>

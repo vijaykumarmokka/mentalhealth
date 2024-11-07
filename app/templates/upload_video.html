@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Video</title>
+</head>
+<body>
+    <h1>Upload a New Video</h1>
+    <form action="{{ url_for('main.upload_video') }}" method="POST">
+        <label for="video_id">Video ID:</label>
+        <input type="text" id="video_id" name="video_id" required><br>
+
+        <button type="submit">Upload Video</button>
+    </form>
+</body>
+</html>

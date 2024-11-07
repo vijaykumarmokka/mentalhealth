@@ -3,13 +3,18 @@ from app import db, bcrypt
 import requests
 from flask_socketio import SocketIO, emit
 from datetime import datetime
-from app.models import User,Appointment,ChatMessage
-from app.models import db, EmergencyContact,UserProfile,Medication
+from app.models import User,Appointment,Book,Video,Prediction
+from app.models import db, EmergencyContact,UserProfile,Medication,Intervention
 from app.forms import RegistrationForm, LoginForm
 from flask_login import login_user, current_user, logout_user, login_required
 import pickle
 import pandas as pd
 import matplotlib.pyplot as plt
+from flask_wtf import FlaskForm
+from wtforms import TextAreaField, SubmitField
+from wtforms.validators import DataRequired
+
+
 
 main = Blueprint('main', __name__)
 socketio = SocketIO()
@@ -19,6 +24,15 @@ socketio = SocketIO()
 @main.route("/")    
 def home():
     return render_template('home.html')
+
+
+
+@main.route("/game")
+@login_required
+def game():
+    return render_template('game.html')
+
+
 
 @main.route("/register", methods=['GET', 'POST'])
 def register():
@@ -60,13 +74,24 @@ def login():
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
             flash('Login successful!', 'success')
-            return redirect(url_for('main.index'))
+            
+            if user.email=="admin@gmail.com" :
+                return redirect(url_for('main.admin_index'))
+            elif user.euid=="professional":
+                return redirect(url_for('main.doctorindex'))
+            else:
+                return redirect(url_for('main.game'))
         else:
             flash('Login Unsuccessful. Please check email and password.', 'danger')
     return render_template('login.html', form=form)
-
+@main.route('/admin')
+@login_required
+def admin_index():
+    pro = User.query.all()
+    return render_template('admin_index.html',pro=pro)
 
 @main.route("/logout")
+@login_required
 def logout():
     logout_user()
     flash('You have been logged out.', 'info')
@@ -82,161 +107,143 @@ def about():
     return render_template('about.html')
 
 
-from app.models import Assessment
 
-@main.route("/assesment", methods=['GET', 'POST'])
+from app.models import Questionnaire  
+
+
+
+@main.route('/questionarie', methods=['GET', 'POST'])
 @login_required
-def assesment():
+def submit_questionnaire():
+     if not current_user.is_authenticated:
+        flash('You need to be logged in to submit a questionnaire.', 'warning')
+        return redirect(url_for('main.login'))
+      # Renamed the function to avoid conflict
+     elif request.method == 'POST':
+        # Create a new questionnaire instance with form data
+        new_questionnaire = Questionnaire(
+            user_id=current_user.id,
+            happiness=request.form.get('happiness'),  # Use get to avoid KeyError if the field is missing
+            stress=request.form.get('stress'),
+            sleep=request.form.get('sleep'),
+            energy=request.form.get('energy'),
+            support=request.form.get('support'),
+            self_esteem=request.form.get('self-esteem'),
+            anxiety=request.form.get('anxiety'),
+            interest=request.form.get('interest'),
+            concentration=request.form.get('concentration'),
+            substance_use=request.form.get('substance_use')
+        )
+
+        # Add the new questionnaire to the session and commit to the database
+        db.session.add(new_questionnaire)
+        db.session.commit()
+
+        flash('Assessment submitted successfully!', 'success')
+        return redirect(url_for('main.index')) 
+
+     return render_template('questionarie.html')  # Render the form for GET requests
+
+import pickle
+from .models import Questionnaire
+
+# Load model and vectorizer at the top-level to avoid reloading them for every request
+with open('./model.pkl', 'rb') as file:
+    loaded_model = pickle.load(file)
+
+with open('./vectorizer.pkl', 'rb') as file:
+    loaded_vectorizer = pickle.load(file)
+
+# Define a function for text cleaning (if needed)
+def clean_text(text):
+    # Your cleaning logic here (e.g., lowercasing, removing punctuation)
+    return text.lower()  # Example cleaning step, expand as needed
+
+@main.route('/predict_emotion',methods=['GET','POST'])
+def predict_emotion():
+    # Retrieve and concatenate the latest assessments
+    latest_results = (
+    Questionnaire.query
+    .filter_by(user_id=current_user.id)  # Filter by the current user's ID
+    .order_by(Questionnaire.id.desc())
+    .limit(1)
+    .all()
+)
+    concatenated_result = ""
+    for result in latest_results:
+        concatenated_result += (
+            f"Happiness: {result.happiness}, "
+            f"Stress: {result.stress}, "
+            f"Sleep: {result.sleep}, "
+            f"Energy: {result.energy}, "
+            f"Support: {result.support}, "
+            f"Self-Esteem: {result.self_esteem}, "
+            f"Anxiety: {result.anxiety}, "
+            f"Interest: {result.interest}, "
+            f"Concentration: {result.concentration}, "
+            f"Substance Use: {result.substance_use}. "
+        )
+    print(concatenated_result)
+    # Clean and transform concatenated text
+    if concatenated_result=="":
+            return render_template('predicted_emotion.html', emotion="give assessment first")
+    
+    new_text_cleaned = [clean_text(concatenated_result)]
+    new_text_tfidf = loaded_vectorizer.transform(new_text_cleaned)
+
+    predicted_emotion = loaded_model.predict(new_text_tfidf)
+
+    # Render result in a template or return as a response
+    user_id = current_user.id  # Assumes user is logged in and current_user is accessible
+    new_prediction = Prediction(user_id=user_id, emotion=predicted_emotion)
+    db.session.add(new_prediction)
+    db.session.commit()
+    return render_template('predicted_emotion.html', emotion=predicted_emotion[0])
+
+@main.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('dashboard.html')
+
+@main.route('/view_intervention', methods=['GET'])
+@login_required
+def view_intervention():
+    # Fetch interventions for the logged-in user
+    interventions = Intervention.query.filter_by(user_id=current_user.id).all()
+    # Render the interventions page with the user's interventions
+    return render_template('view_intervention.html', interventions=interventions, user=current_user)
+  
+
+@main.route('/uploadbook', methods=['GET', 'POST'])
+def upload_book():
     if request.method == 'POST':
-        try:
-            assessment = Assessment(
-                user_id=current_user.id,
-                course=int(request.form['Course']),
-                gender=int(request.form['Gender']),
-                sleep_quality=int(request.form['Sleep_Quality']),
-                physical_activity=int(request.form['Physical_Activity']),
-                diet_quality=int(request.form['Diet_Quality']),
-                social_support=int(request.form['Social_Support']),
-                relationship_status=int(request.form['Relationship_Status']),
-                substance_use=int(request.form['Substance_Use']),
-                counseling_service_use=int(request.form['Counseling_Service_Use']),
-                family_history=int(request.form['Family_History']),
-                chronic_illness=int(request.form['Chronic_Illness']),
-                extracurricular_involvement=int(request.form['Extracurricular_Involvement']),
-                residence_type=int(request.form['Residence_Type']),
-                age=int(request.form['Age']),
-                cgpa=float(request.form['CGPA']),
-                stress_level=int(request.form['Stress_Level']),
-                financial_stress=int(request.form['Financial_Stress']),
-                semester_credit_load=int(request.form['Semester_Credit_Load'])
-            )
-            print(f'Creating Assessment: {assessment}')
+        title = request.form.get('title')
+        author = request.form.get('author')
+        cover_image = request.form.get('cover_image')
+        download_link = request.form.get('download_link')
 
-    
-            db.session.add(assessment)
-            db.session.commit()
-            flash("Assessment submitted successfully!", "success")
-            return redirect(url_for('main.predict'))
-        except Exception as e:
-            db.session.rollback()  
-            print(f"Error occurred: {e}")  
-            flash(f"Error occurred while submitting the assessment: {e}", "danger")
+        new_book = Book(title=title, author=author, cover_image=cover_image, download_link=download_link)
+        db.session.add(new_book)
+        db.session.commit()
 
-    return render_template('assesment.html')
+        return redirect(url_for('main.upload_book'))
+    return render_template('upload_book.html')
 
+@main.route('/uploadvideo', methods=['GET', 'POST'])
+def upload_video():
+    if request.method == 'POST':
+        video_id = request.form.get('video_id')
 
+        new_video = Video(video_id=video_id)
+        db.session.add(new_video)
+        db.session.commit()
 
+        return redirect(url_for('main.upload_video'))
+    return render_template('upload_video.html')
 
-
-
-
-
-
-
-
-
-import io
-import base64
-
-
-@main.route("/charts")
-def charts():
-    assessments = Assessment.query.all()
-    
-    if not assessments:
-        return render_template('charts.html', charts=None, message="No assessment data found. Please take the assessment.")
-
-    data = pd.DataFrame([{
-        "Course": a.course,
-        "Gender": a.gender,
-        "Sleep Quality": a.sleep_quality,
-        "Physical Activity": a.physical_activity,
-        "Diet Quality": a.diet_quality,
-        "Social Support": a.social_support,
-        "Relationship Status": a.relationship_status,
-        "Substance Use": a.substance_use,
-        "Counseling Service Use": a.counseling_service_use,
-        "Family History": a.family_history,
-        "Chronic Illness": a.chronic_illness,
-        "Extracurricular Involvement": a.extracurricular_involvement,
-        "Residence Type": a.residence_type,
-        "Age": a.age,
-        "CGPA": a.cgpa,
-        "Stress Level": a.stress_level,
-        "Financial Stress": a.financial_stress,
-        "Semester Credit Load": a.semester_credit_load
-    } for a in assessments])
-
-    charts_base64 = {}
-
-
-    features_for_bar_chart = [
-        'Sleep Quality',
-        'Physical Activity',
-        'Diet Quality',
-        'Social Support',
-        'Relationship Status',
-        'Substance Use',
-        'Counseling Service Use',
-        'Family History',
-        'Chronic Illness',
-        'Extracurricular Involvement',
-        'Residence Type',
-        'Stress Level',
-        'Financial Stress'
-    ]
-
-    feature_counts = data[features_for_bar_chart].apply(pd.Series.value_counts).fillna(0)
-    feature_counts = feature_counts.sum().sort_index()
-
-    plt.figure(figsize=(10, 6))
-    feature_counts.plot(kind='bar', color='skyblue')
-    plt.title('Frequency of Selected Features')
-    plt.xlabel('Features')
-    plt.ylabel('Frequency')
-
-    bar_chart = io.BytesIO()
-    plt.savefig(bar_chart, format='png')
-    bar_chart.seek(0)
-    charts_base64['Feature Frequency'] = base64.b64encode(bar_chart.getvalue()).decode('utf-8')
-    plt.close()  
-
-
-    positive_features = [
-        'Physical Activity',
-        'Social Support',
-        'Diet Quality',
-        'Counseling Service Use',
-        'Extracurricular Involvement'
-    ]
-
-    negative_features = [
-        'Substance Use',
-        'Chronic Illness',
-        'Stress Level',
-        'Financial Stress'
-    ]
-    positive_count = data[positive_features].notnull().sum().sum()
-    negative_count = data[negative_features].notnull().sum().sum()
-
-
-    pie_data = [positive_count, negative_count]
-    pie_labels = ['Positive Impact', 'Negative Impact']
-
-    plt.figure(figsize=(8, 8))
-    plt.pie(pie_data, labels=pie_labels, autopct='%1.1f%%', startangle=90, colors=['#4CAF50', '#FF5722'])
-    plt.title('Positive vs Negative Impact Features')
-    
-    pie_chart = io.BytesIO()
-    plt.savefig(pie_chart, format='png')
-    pie_chart.seek(0)
-    charts_base64['Positive vs Negative Impact'] = base64.b64encode(pie_chart.getvalue()).decode('utf-8')
-    plt.close()  
-
-    return render_template('charts.html', charts=charts_base64)
-
-
-
+if __name__ == '__main__':
+    db.create_all()
+    app.run(debug=True)
 
 @main.route("/educational_resources")
 @login_required
@@ -283,6 +290,7 @@ def schedule_appointment():
     return render_template('schedule_appointment.html')
 
 @main.route('/appointments/edit/<int:appointment_id>', methods=['GET', 'POST'])
+@login_required
 def edit_appointment(appointment_id):
     appointment = Appointment.query.get_or_404(appointment_id)
 
@@ -296,6 +304,7 @@ def edit_appointment(appointment_id):
     return render_template('edit_appointment.html', appointment=appointment)
 
 @main.route('/appointments/delete/<int:appointment_id>', methods=['POST'])
+@login_required
 def delete_appointment(appointment_id):
     appointment = Appointment.query.get_or_404(appointment_id)
     db.session.delete(appointment)
@@ -304,6 +313,7 @@ def delete_appointment(appointment_id):
     return redirect(url_for('main.appointments'))
 
 @main.route('/appointments', methods=['GET'])
+@login_required
 def appointments():
     all_appointments = Appointment.query.all()
     return render_template('appointments.html', appointments=all_appointments)
@@ -346,6 +356,7 @@ def track_medications():
     medications = Medication.query.filter_by(user_id=current_user.id).all()
     return render_template('track_medications.html', medications=medications)
 @main.route('/edit_medication/<int:medication_id>', methods=['GET', 'POST'])
+@login_required
 def edit_medication(medication_id):
     medication = Medication.query.get_or_404(medication_id)
 
@@ -372,6 +383,7 @@ def edit_medication(medication_id):
     return render_template('edit_medication.html', medication=medication)
 
 @main.route('/delete_medication/<int:medication_id>', methods=['POST'])
+@login_required
 def delete_medication(medication_id):
     medication = Medication.query.get_or_404(medication_id)
 
@@ -430,6 +442,7 @@ def emergency_support():
     emergency_numbers = [...]  
     return render_template('emergency_support.html', contacts=contacts, emergency_numbers=emergency_numbers)
 @main.route("/edit_contact/<int:id>", methods=['GET', 'POST'])
+@login_required
 def edit_contact(id):
     contact = EmergencyContact.query.get_or_404(id)
 
@@ -500,125 +513,86 @@ def display_user_profile():
     return render_template('display_user_profile.html', profile=profile)
 
 
-import os
+@main.route('/books')
+def books():
+    all_books = Book.query.all()  # Fetch all books from the database
+    return render_template('books.html', books=all_books)
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
+@main.route('/videos')
+def videos():
+    videos = Video.query.all()  # Fetch all video records
+    return render_template('videos.html', videos=videos)
 
-model_path = os.path.join(base_dir, 'model.pkl')
+@main.route('/doctor')
+def doctor():
+    # Query users with EUID set to "PROFESSIONAL"
+    professionals = User.query.filter_by(euid="professional").all()
+    return render_template('doctor.html', professionals=professionals)
 
-with open(model_path, 'rb') as f:
-    RF_model = pickle.load(f)
+@main.route('/doctorindex')
+def doctorindex():
+    # Query users with EUID set to "PROFESSIONAL"
+    persons = User.query.filter_by(euid="regular").all()
+    return render_template('doctorindex.html', persons=persons)
 
-@main.route('/predict', methods=['GET'])
+@main.route('/prediction_history/<int:user_id>')
 @login_required
-def predict():
-    user_id = current_user.id
-    assessment = Assessment.query.filter_by(user_id=user_id).first()
+def prediction_history(user_id):
+    predictions = Prediction.query.filter_by(user_id=user_id).order_by(Prediction.timestamp.desc()).all()
+    return render_template('prediction_history.html', predictions=predictions)
 
-    if not assessment:
-        flash('No assessment data found for this user.', 'danger')
-        return redirect(url_for('main.assesment'))  
-    data_df = pd.DataFrame([{
-        'Course': assessment.course,
-        'Gender': assessment.gender,
-        'Sleep_Quality': assessment.sleep_quality,
-        'Physical_Activity': assessment.physical_activity,
-        'Diet_Quality': assessment.diet_quality,
-        'Social_Support': assessment.social_support,
-        'Relationship_Status': assessment.relationship_status,
-        'Substance_Use': assessment.substance_use,
-        'Counseling_Service_Use': assessment.counseling_service_use,
-        'Family_History': assessment.family_history,
-        'Chronic_Illness': assessment.chronic_illness,
-        'Extracurricular_Involvement': assessment.extracurricular_involvement,
-        'Residence_Type': assessment.residence_type,
-        'Age': assessment.age,
-        'CGPA': assessment.cgpa,
-        'Stress_Level': assessment.stress_level,
-        'Financial_Stress': assessment.financial_stress,
-        'Semester_Credit_Load': assessment.semester_credit_load
-    }])
 
-    predicted_value = RF_model.predict(data_df)[0]
+@main.route('/view_user_profile/<int:user_id>')
+@login_required
+def view_user_profile(user_id):
+    user = User.query.get_or_404(user_id)
+    user_profile = UserProfile.query.filter_by(user_id=user_id).first()
+    assessments = Questionnaire.query.filter_by(user_id=user_id).all()
+    appointments = Appointment.query.filter_by(user_id=user_id).all()
+    medications = Medication.query.filter_by(user_id=user_id).all()
+    predicted_results = Prediction.query.filter_by(user_id=user_id).all()
+    interventions = Intervention.query.filter_by(user_id=user_id).all()
 
-    if predicted_value == 0:
-        message = (
-            "Prediction Value: 0 (No or Very Low Depression)\n\n"
-            "Intervention & Insights: Congratulations on achieving a state of no or very low depression! This is a positive sign of your mental well-being. "
-            "To maintain your mental health, consider adopting the following practices:\n\n"
-            "Precautions: Continue engaging in regular physical activity, as it can help enhance your mood and overall well-being. "
-            "Make sure to prioritize sufficient sleep and a balanced diet, as these factors significantly contribute to your mental health.\n\n"
-            "Work to Do: Explore new hobbies or activities that interest you. Engaging in creative outlets such as art, music, or sports can provide a fulfilling way "
-            "to express yourself and connect with others.\n\n"
-            "Consulting a Doctor: While your current state is positive, it’s always beneficial to check in with a healthcare professional if you notice any changes "
-            "in your mood or behavior. Regular mental health check-ups can provide support and ensure you continue to thrive."
+    return render_template(
+        'view_user_profile.html',
+        user=user,
+        user_profile=user_profile,
+        assessments=assessments,
+        appointments=appointments,
+        medications=medications,
+        predicted_results=predicted_results,
+        interventions=interventions
+    )
+
+from app.models import User, Intervention
+from app.forms import InterventionForm
+
+@main.route('/add_intervention/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+def add_intervention(user_id):
+    user = User.query.get_or_404(user_id)
+    form = InterventionForm()
+    if form.validate_on_submit():
+        intervention = Intervention(
+            user_id=user.id,
+            intervention_type=form.intervention_type.data,
+            details=form.details.data
         )
-    elif predicted_value == 1:
-        message = (
-            "Prediction Value: 1 (Mild to Moderate Depression)\n\n"
-            "Intervention & Insights: A prediction of mild to moderate depression indicates that it may be helpful for you to take proactive steps to improve your mental health.\n\n"
-            "Precautions: Pay attention to your feelings and identify any triggers that contribute to your mood changes. "
-            "Make an effort to engage in self-care activities that you enjoy and that bring you relaxation and joy.\n\n"
-            "Work to Do: Consider setting small, achievable goals for yourself each day to instill a sense of accomplishment. "
-            "This could include simple tasks like taking a walk, reading a book, or practicing mindfulness exercises. Keeping a journal to express your thoughts and feelings can also be beneficial.\n\n"
-            "Consulting a Doctor: It’s important to consult a mental health professional who can provide guidance tailored to your situation. "
-            "They can suggest therapies or coping strategies and may recommend counseling or medication if necessary. Don't hesitate to seek help—acknowledging your feelings is a crucial step toward healing."
-        )
-    elif predicted_value == 2:
-        message = (
-            "Prediction Value: 2 (Severe Depression)\n\n"
-            "Intervention & Insights: A prediction of severe depression signals that you may be facing significant challenges that require immediate attention and support. "
-            "It’s crucial to take this seriously and explore available resources:\n\n"
-            "Precautions: Prioritize your safety and well-being. Remove any potential sources of harm and ensure you have a supportive environment around you. "
-            "It’s important to reach out to trusted friends or family members and communicate how you’re feeling.\n\n"
-            "Work to Do: Take small steps to manage your daily activities. Consider implementing a structured routine that includes basic self-care practices like eating, sleeping, "
-            "and engaging in light physical activities, even if it feels difficult. Celebrate any small victories, as they can contribute to improving your mood over time.\n\n"
-            "Consulting a Doctor: Seeking professional help is critical at this stage. A qualified mental health professional can provide a thorough assessment and recommend a treatment plan tailored to your needs. "
-            "They may suggest psychotherapy, medication, or a combination of both. If you have thoughts of self-harm or are in crisis, please seek immediate help from emergency services or a crisis hotline."
-        )
-    else:
-        message = "An unexpected error occurred. Please try again later."
-    return render_template('result.html', interventions={"title": f"Depression Level: {predicted_value}", "message": message})
+        db.session.add(intervention)
+        db.session.commit()
+        flash('Intervention added successfully!', 'success')
+        return redirect(url_for('main.view_user_profile', user_id=user.id))  # Use the correct profile view
+    return render_template('add_intervention.html', form=form, user=user)
 
 
-
-
-
-
-
-
-
-    
-@main.route("/chat")
+from flask import session
+@main.route('/chat')
 @login_required
 def chat():
     return render_template('chat.html')
 
-# Send a message
-@socketio.on('send_message')
-def handle_send_message(data):
-    message = ChatMessage(
-        sender_id=current_user.id,
-        receiver_id=data['receiver_id'],
-        content=data['content'],
-        timestamp=datetime.utcnow()
-    )
-    db.session.add(message)
-    db.session.commit()
+if __name__ == '__main__':
+    app.run(debug=True)
 
-    emit('receive_message', {
-        'sender_id': current_user.id,
-        'content': data['content'],
-        'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
-    }, room=data['receiver_id'])
 
-# Get messages between users
-@main.route("/messages/<int:receiver_id>")
-@login_required
-def get_messages(receiver_id):
-    messages = ChatMessage.query.filter(
-        (ChatMessage.sender_id == current_user.id) & (ChatMessage.receiver_id == receiver_id) |
-        (ChatMessage.sender_id == receiver_id) & (ChatMessage.receiver_id == current_user.id)
-    ).order_by(ChatMessage.timestamp).all()
-    
-    return render_template('messages.html', messages=messages, receiver_id=receiver_id)
+ 

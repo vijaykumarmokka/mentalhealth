@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+    <style>
+        .admin-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 40px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        .admin-button {
+            padding: 15px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .admin-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+
+    <div class="admin-container">
+        <h1>Admin Dashboard</h1>
+        <div class="button-container">
+            <a href="{{ url_for('main.upload_video') }}" class="admin-button">Upload Video</a>
+            <a href="{{ url_for('main.upload_book') }}" class="admin-button">Upload Book</a>
+        </div>
+
+        <!-- View users links -->
+        <div class="button-container">
+            {% for user in pro %}
+                <a href="{{ url_for('main.view_user_profile', user_id=user.id) }}" class="admin-button">View Profile of {{ user.first_name }}</a>
+            {% endfor %}
+        </div>
+
+        <!-- Upload buttons -->
+       
+    </div>
+{% endblock %}

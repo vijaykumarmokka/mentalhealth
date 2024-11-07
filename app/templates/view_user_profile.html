@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ user.first_name }} {{ user.last_name }}'s Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            font-size: 1.2em;
+            color: #555;
+        }
+        .profile-info, .details {
+            list-style-type: none;
+            padding: 0;
+            color: #666;
+        }
+        .details li {
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: white;
+            background-color: #007bff;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ user.first_name }} {{ user.last_name }}'s Profile</h1>
+        
+        <!-- Basic Information -->
+        <div class="section">
+            <h2>Basic Information</h2>
+            <ul class="profile-info">
+                <li>Email: {{ user.email }}</li>
+                <li>Date of Birth: {{ user.dob }}</li>
+                <li>Occupation: {{ user_profile.occupation if user_profile else 'Not Provided' }}</li>
+                <li>Address: {{ user_profile.address if user_profile else 'Not Provided' }}</li>
+                <li>Phone: {{ user_profile.phone_number if user_profile else 'Not Provided' }}</li>
+                <li>Aim: {{ user_profile.aim if user_profile else 'Not Provided' }}</li>
+                <li>Passion: {{ user_profile.passion if user_profile else 'Not Provided' }}</li>
+            </ul>
+        </div>
+
+        <!-- Assessments -->
+        <div class="section">
+            <h2>Assessments</h2>
+            {% if assessments %}
+                <ul class="details">
+                    {% for assessment in assessments %}
+                        <li>Date: {{ assessment.date }} - Happiness: {{ assessment.happiness }}, Stress: {{ assessment.stress }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No assessments available.</p>
+            {% endif %}
+        </div>
+
+        <!-- Appointments -->
+        <div class="section">
+            <h2>Appointments</h2>
+            {% if appointments %}
+                <ul class="details">
+                    {% for appointment in appointments %}
+                        <li>Date: {{ appointment.date }} - Time: {{ appointment.time }} - Reason: {{ appointment.description }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No appointments found.</p>
+            {% endif %}
+        </div>
+
+        <!-- Medications -->
+        <div class="section">
+            <h2>Medications</h2>
+            {% if medications %}
+                <ul class="details">
+                    {% for medication in medications %}
+                        <li>Name: {{ medication.medication_name }} - Dosage: {{ medication.dosage }}, Frequency: {{ medication.frequency }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No medications prescribed.</p>
+            {% endif %}
+        </div>
+
+        <!-- Predicted Results -->
+        <div class="section">
+            <h2>Predicted Results</h2>
+            {% if predicted_results %}
+                <ul class="details">
+                    {% for result in predicted_results %}
+                        <li>Date: {{ result.timestamp.strftime('%Y-%m-%d') }} - Emotion: {{ result.emotion }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No predicted results available.</p>
+            {% endif %}
+        </div>
+
+        <!-- Interventions -->
+        <div class="section">
+            <h2>Interventions</h2>
+            {% if interventions %}
+                <ul class="details">
+                    {% for intervention in interventions %}
+                        <li>Date Added: {{ intervention.date_added.strftime('%Y-%m-%d') }} - Type: {{ intervention.intervention_type }}, Details: {{ intervention.details }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No interventions available.</p>
+            {% endif %}
+            <a href="{{ url_for('main.add_intervention', user_id=user.id) }}">ADD intervention</a>
+        </div>
+
+        <a href="{{ url_for('main.doctorindex') }}">Back to All Users</a>
+    </div>
+</body>
+</html>

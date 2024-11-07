@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField,DateField
+from wtforms import StringField, PasswordField, SubmitField,DateField,TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 from app.models import User
+
 class RegistrationForm(FlaskForm):
     euid = StringField('EUID', validators=[DataRequired()])
     first_name = StringField('First Name', validators=[DataRequired()])
@@ -22,3 +23,8 @@ class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
+
+class InterventionForm(FlaskForm):
+    intervention_type = StringField('Intervention Type', validators=[DataRequired()])
+    details = TextAreaField('Details', validators=[DataRequired()])
+    submit = SubmitField('Add Intervention')

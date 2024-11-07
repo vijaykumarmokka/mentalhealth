@@ -1,58 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergency Support</title>
+{% extends 'base.html' %}
+
+{% block content %}
     <style>
-         /* Global CSS to hide scrollbars while allowing scrolling */
-
-        body {
+        /* Form-specific CSS */
+        .emergency-support {
             font-family: Arial, sans-serif;
-            background-color: #f0f4f7;
-            margin: 0;
-            padding: 20px;
-        }
-
-        h1, h2 {
-            color: #2c3e50;
-        }
-
-        .container {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .column {
-            width: 45%;
-            padding: 10px;
-            background-color: #ecf0f1;
+            background-color: #f0f4f7; /* Background color for the entire form area */
+            padding: 80px;
             border-radius: 5px;
         }
 
-        .column h3 {
+        .emergency-support h1 {
+            color: #2c3e50;
+        }
+
+        .emergency-support .container {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping for smaller screens */
+            justify-content: space-between; /* Space between columns */
+            margin-top: 20px; /* Space at the top */
+        }
+
+        .emergency-support .column {
+            flex: 1 1 300px; /* Allow flexible column sizing */
+            padding: 10px;
+            margin: 10px; /* Space between columns */
+            background-color: #ecf0f1; /* Column background */
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+        }
+
+        .emergency-support .column h3 {
             color: #2980b9;
         }
 
-        ul {
+        .emergency-support ul {
             list-style-type: none;
             padding: 0;
         }
 
-        ul li {
-            background-color: #ffffff;
+        .emergency-support ul li {
+            background-color: #ffffff; /* Individual item background */
             margin: 5px 0;
             padding: 10px;
             border-radius: 5px;
         }
 
-        ul li a {
+        .emergency-support ul li a {
             text-decoration: none;
             color: #3498db;
         }
 
-        ul li button {
-            background-color: #e74c3c;
+        .emergency-support ul li button {
+            background-color: #e74c3c; /* Delete button background */
             color: white;
             border: none;
             padding: 5px 10px;
@@ -60,34 +60,36 @@
             cursor: pointer;
         }
 
-        ul li button:hover {
-            background-color: #c0392b;
+        .emergency-support ul li button:hover {
+            background-color: #c0392b; /* Hover effect for delete button */
         }
 
-        form {
-            background-color: #ecf0f1;
+        .emergency-support form {
+            background-color: #ecf0f1; /* Form background */
             padding: 20px;
             border-radius: 5px;
-            margin-top: 20px;
+            width: 100%;
+            max-width: 600px; /* Max width for form */
         }
 
-        label {
+        .emergency-support label {
             display: block;
             margin-top: 10px;
             font-weight: bold;
         }
 
-        input[type="text"], input[type="tel"] {
+        .emergency-support input[type="text"],
+        .emergency-support input[type="tel"] {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
             border-radius: 5px;
-            border: 1px solid #bdc3c7;
+            border: 1px solid #bdc3c7; /* Input border */
         }
 
-        button {
+        .emergency-support button {
             margin-top: 20px;
-            background-color: #2ecc71;
+            background-color: #2ecc71; /* Add contact button background */
             color: white;
             padding: 10px 15px;
             border: none;
@@ -95,97 +97,97 @@
             cursor: pointer;
         }
 
-        button:hover {
-            background-color: #27ae60;
+        .emergency-support button:hover {
+            background-color: #27ae60; /* Hover effect for add button */
         }
 
-        .messages {
+        .emergency-support .messages {
             margin-top: 20px;
             padding: 10px;
             border-radius: 5px;
         }
 
-        .messages li {
+        .emergency-support .messages li {
             margin-bottom: 10px;
             padding: 10px;
         }
 
-        .success {
-            background-color: #2ecc71;
+        .emergency-support .success {
+            background-color: #2ecc71; /* Success message background */
             color: white;
         }
 
-        .error {
-            background-color: #e74c3c;
+        .emergency-support .error {
+            background-color: #e74c3c; /* Error message background */
             color: white;
         }
     </style>
-</head>
-<body>
-    <h1>Emergency Support</h1>
 
-    <div class="container">
-        <!-- Default Emergency Numbers Column -->
-        <div class="column">
-            <h3>Default Emergency Numbers</h3>
-            <ul>
-                <li>Police: 100</li>
-                <li>Ambulance: 108</li>
-                <li>Fire Brigade: 101</li>
-                <li>Disaster Management: 1078</li>
-                <li>Women's Helpline: 1091</li>
-            </ul>
+    <div class="emergency-support">
+        <h1>Emergency Support</h1>
+
+        <div class="container">
+            <!-- Default Emergency Numbers Column -->
+            <div class="column">
+                <h3>Default Emergency Numbers</h3>
+                <ul>
+                    <li>Police: 100</li>
+                    <li>Ambulance: 108</li>
+                    <li>Fire Brigade: 101</li>
+                    <li>Disaster Management: 1078</li>
+                    <li>Women's Helpline: 1091</li>
+                </ul>
+            </div>
+
+            <!-- Fetched Emergency Numbers Column -->
+            <div class="column">
+                <h3>Your Emergency Contacts</h3>
+                {% if contacts %}
+                <ul>
+                    {% for contact in contacts %}
+                        <li>
+                            {{ contact.name }} ({{ contact.relationship }}): {{ contact.phone }}
+                            <div>
+                                <a href="{{ url_for('main.edit_contact', id=contact.id) }}">Edit</a>
+                                <form action="{{ url_for('main.delete_contact', id=contact.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>You have not added any contacts yet.</p>
+                {% endif %}
+            </div>
+
+            <!-- Add New Contact Form Column -->
+            <div class="column">
+                <h3>Add a New Emergency Contact</h3>
+                <form action="{{ url_for('main.emergency_support') }}" method="POST">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+
+                    <label for="phone">Phone:</label>
+                    <input type="tel" id="phone" name="phone" required>
+
+                    <label for="relationship">Relationship:</label>
+                    <input type="text" id="relationship" name="relationship">
+
+                    <button type="submit">Add Contact</button>
+                </form>
+            </div>
         </div>
 
-        <!-- Fetched Emergency Numbers Column -->
-        <div class="column">
-            <h2>Your Emergency Contacts</h2>
-
-            {% if contacts %}
-            <ul>
-                {% for contact in contacts %}
-                    <li>
-                        {{ contact.name }} ({{ contact.relationship }}): {{ contact.phone }}
-                        <div>
-                            <a href="{{ url_for('main.edit_contact', id=contact.id) }}">Edit</a>
-                            <form action="{{ url_for('main.delete_contact', id=contact.id) }}" method="POST" style="display:inline;">
-                                <button type="submit">Delete</button>
-                            </form>
-                        </div>
-                    </li>
-                {% endfor %}
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <ul class="messages">
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
             </ul>
-            {% else %}
-            <p>You have not added any contacts yet.</p>
-            {% endif %}
-        </div>
+        {% endif %}
+        {% endwith %}
     </div>
-
-    
-
-    <h2>Add a New Emergency Contact</h2>
-    <form action="{{ url_for('main.emergency_support') }}" method="POST">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
-
-        <label for="phone">Phone:</label>
-        <input type="tel" id="phone" name="phone" required>
-
-        <label for="relationship">Relationship:</label>
-        <input type="text" id="relationship" name="relationship">
-
-        <button type="submit">Add Contact</button>
-    </form>
-
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=True) %}
-    {% if messages %}
-        <ul class="messages">
-        {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
-    {% endwith %}
-</body>
-</html>
+{% endblock %}
