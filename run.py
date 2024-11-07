@@ -1,4 +1,4 @@
-from app import create_app, socketio  # Import create_app and socketio
+from app import create_app, socketio,db # Import create_app and socketio
 from flask_socketio import SocketIO
 
 # Create the Flask app
