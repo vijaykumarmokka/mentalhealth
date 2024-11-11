@@ -87,8 +87,10 @@
         <div class="login-container">
             <h2>Login</h2>
             <form method="POST">
-                {{ form.hidden_tag() }}  <!-- This generates the CSRF token -->
+                {{ form.hidden_tag() }} 
+                <label for="email">Email Address</label><!-- This generates the CSRF token -->
                 <input type="email" placeholder="Email" name="email" required>
+                <label for="password">Password</label>
                 <input type="password" placeholder="Password" name="password" required>
 
                 <div class="button-container">
