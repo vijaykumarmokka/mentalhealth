@@ -88,8 +88,9 @@
             <h2>Login</h2>
             <form method="POST">
                 {{ form.hidden_tag() }} 
+                <label for="email">Email Address</label>
                 <input type="email" placeholder="Email" name="email" aria-label="Email Address" required>
-    
+                <label for="password">Password</label>
                 <input type="password" placeholder="Password" name="password" aria-label="Password" required>
 
                 <div class="button-container">
